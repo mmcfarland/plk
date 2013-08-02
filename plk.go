@@ -36,6 +36,7 @@ func setupDb() (db *sql.DB) {
 
 func ParcelMarshal(w http.ResponseWriter, p *Parcel, err error) {
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, "Could not find parcel", 404)
 		return
 	}
@@ -45,7 +46,6 @@ func ParcelMarshal(w http.ResponseWriter, p *Parcel, err error) {
 }
 
 func ByCoords(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("func")
 	lat, err := strconv.ParseFloat(r.FormValue("lat"), 32)
 	if err != nil {
 		http.Error(w, "Bad 'lat' value", 500)
@@ -57,13 +57,16 @@ func ByCoords(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pt := fmt.Sprint("POINT (%f %f)", lon, lat)
-	sql := `SELECT mapreg 
-            FROM opa_parcel
+	pt := fmt.Sprintf("POINT (%f %f)", lon, lat)
+	sql := `SELECT brt_id 
+            FROM pwd_parcels
             WHERE ST_Intersects(ST_GeomFromText($1, 4326), geom) = true;`
 	s, err := DbConn.Prepare(sql)
 	var p Parcel
-	fmt.Println(err)
+	fmt.Println(pt)
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = s.QueryRow(pt).Scan(&p.OpaNum)
 	ParcelMarshal(w, &p, err)
 }
