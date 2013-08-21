@@ -7,10 +7,10 @@ cd /tmp/
 rm -rf dor_parcels_workspace
 mkdir dor_parcels_workspace && cd dor_parcels_workspace
 wget http://www.pasda.psu.edu/philacity/data/Philadelphia_DOR_Parcels_Active201302.zip 
-unzip Philadelphia_DOR_Parcles_Active201302.zip
+unzip Philadelphia_DOR_Parcels_Active201302.zip
 
 # Load the shapefile into postgis
-shp2pgsql -I -D -s 2272 Philadelphia_DOR_Parcles_Active201302/Philadelphia_DOR_Parcles_Active201302.shp dor_parcels > p.sql
+shp2pgsql -I -D -s 2272 Philadelphia_DOR_Parcels_Active201302/Philadelphia_DOR_Parcels_Active201302.shp dor_parcels > p.sql
 psql -d $DB -c "drop table dor_parcels;"
 psql -d $DB -f p.sql
 

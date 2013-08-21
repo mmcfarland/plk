@@ -10,7 +10,7 @@ wget http://gis.phila.gov/data/PARCELS_PWD.zip
 unzip PARCELS_PWD.zip
 
 # Load the shapefile into postgis
-shp2pgsql -I -D -s 2272 PARCELS_PWD/PARCELS_PWD.shp pwd_parcels > p.sql
+shp2pgsql -I -D -s 2272 PARCELS_PWD.shp pwd_parcels > p.sql
 psql -d $DB -c "drop table pwd_parcels;"
 psql -d $DB -f p.sql
 
