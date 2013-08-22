@@ -13,6 +13,6 @@ CREATE TABLE plk AS
 SELECT p.brt_id, p.parcelid, p.address, d.basereg, d.mapreg, 
        p.geom as pwd_geom, d.geom as dor_geom 
        FROM pwd_parcels as p 
-       LEFT JOIN dor_parcel as d on ST_Contains(d.geom, p.pos);
+       LEFT JOIN dor_parcels as d on ST_Contains(d.geom, p.pos);
 
 EOF
