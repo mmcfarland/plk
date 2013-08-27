@@ -1,6 +1,7 @@
 package main
 
 import (
+	"code.google.com/p/gcfg"
 	"database/sql"
 	"encoding/json"
 	"flag"
@@ -12,19 +13,23 @@ import (
 	"strconv"
 )
 
-var (
-	port   = flag.Int("port", 7979, "Server Port")
-	DbConn = setupDb()
-)
-
-const (
-	ConnString = "user=postgres dbname=dataviewer"
-)
-
 type Hdl func(w http.ResponseWriter, r *http.Request)
 type Parcel struct {
 	OpaNum int `json:"opa"`
 }
+
+type Config struct {
+	Database struct {
+		Name string
+		User string
+	}
+}
+
+var (
+	port       = flag.Int("port", 7979, "Server Port")
+	DbConn     *sql.DB
+	ConnString string
+)
 
 func setupDb() (db *sql.DB) {
 	db, err := sql.Open("postgres", ConnString)
@@ -75,8 +80,18 @@ func main() {
 	flag.Parse()
 	defer DbConn.Close()
 
+	var conf Config
+	err := gcfg.ReadFileInto(&conf, "settings.conf")
+	if err != nil {
+		fmt.Println("Invalid setting.conf file", err)
+		return
+	}
+	ConnString = fmt.Sprintf("user=%s dbname=%s", conf.Database.User, conf.Database.Name)
+	DbConn = setupDb()
+
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api/v0.1").Subrouter()
+	api.StrictSlash(false)
 	api.HandleFunc("/parcel/", ByCoords).Queries("lat", "", "lon", "")
 	//api.Handle("/parcel/", ByAddress).Queries("address", "")
 	//api.Handle("/parcel/", ByRegMap).Queries("regmap", "")
