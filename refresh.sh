@@ -15,4 +15,7 @@ SELECT p.brt_id, p.parcelid, p.address, d.basereg, d.mapreg,
        FROM pwd_parcels as p 
        LEFT JOIN dor_parcels as d on ST_Contains(d.geom, p.pos);
 
+CREATE index mapreg_idx on plk (mapreg);
+CREATE index pwd_geom_idx on plk using gist (pwd_geom);
+create index opa_idx on plk (brt_id);
 EOF
